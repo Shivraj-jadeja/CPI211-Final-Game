@@ -5,9 +5,10 @@ public class GhostChase : MonoBehaviour
 {
     public Transform player;
     public float chaseDistance = 20f;
+    public float chaseSpeed = 4.5f;
     public float phaseSpeed = 4.5f;
     public TrailRenderer trail;
-    public float movementThreshold = 0.05f;
+    public float movementThreshold = 0.02f;
 
     [HideInInspector] public bool isPhasing = false;
 
@@ -17,6 +18,8 @@ public class GhostChase : MonoBehaviour
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
+        agent.speed = chaseSpeed;
+
         lastPosition = transform.position;
 
         if (trail != null)
@@ -72,8 +75,10 @@ public class GhostChase : MonoBehaviour
             if (!agent.enabled)
             {
                 agent.enabled = true;
+                agent.Warp(transform.position);
             }
 
+            agent.speed = chaseSpeed;
             agent.SetDestination(player.position);
         }
 
