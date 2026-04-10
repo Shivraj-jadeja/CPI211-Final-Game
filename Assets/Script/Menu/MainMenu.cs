@@ -3,8 +3,8 @@ using UnityEngine.SceneManagement;
 
 public class MainMenu : MonoBehaviour
 {
-    public string gameSceneName = "GameScene";
-    public string controlsSceneName = "UI_Control";
+    public string gameSceneName = "Login";
+
 
     void Update()
     {
@@ -13,9 +13,9 @@ public class MainMenu : MonoBehaviour
             StartGame();
         }
 
-        if (Input.GetKeyDown(KeyCode.B))
+        if (Input.GetKeyDown(KeyCode.Escape))
         {
-            OpenControls();
+            QuitGame();
         }
     }
 
@@ -24,19 +24,14 @@ public class MainMenu : MonoBehaviour
         SceneManager.LoadScene(gameSceneName);
     }
 
-    public void OpenControls()
-    {
-        SceneManager.LoadScene(controlsSceneName);
-    }
-
     public void QuitGame()
     {
-    Debug.Log("Quit Game");
+        Debug.Log("Quit Game");
 
-    #if UNITY_EDITOR
-    UnityEditor.EditorApplication.isPlaying = false;
-    #else
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#else
     Application.Quit();
-    #endif
+#endif
     }
 }
