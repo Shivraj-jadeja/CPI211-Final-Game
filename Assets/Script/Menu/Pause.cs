@@ -6,7 +6,8 @@ using UnityEngine.EventSystems;
 public class Pause : MonoBehaviour
 {
     public GameObject pauseUI;
-    public Button exitButton; // Drag your button here
+    public Button exitButton;
+    public Button resumeButton;
 
     private bool isPaused = false;
 
@@ -17,19 +18,26 @@ public class Pause : MonoBehaviour
         if (pauseUI != null)
             pauseUI.SetActive(false);
 
-        // Connect button
+        // Connect exit button
         if (exitButton != null)
         {
             exitButton.onClick.AddListener(QuitGame);
-            Debug.Log("Button connected successfully");
+            Debug.Log("Exit button connected successfully");
         }
         else
         {
             Debug.LogError("Exit button not assigned!");
         }
-        if (Input.GetMouseButtonDown(0))
+
+        // Connect resume button
+        if (resumeButton != null)
         {
-            Debug.Log("Over UI? " + EventSystem.current.IsPointerOverGameObject());
+            resumeButton.onClick.AddListener(ResumeGame);
+            Debug.Log("Resume button connected successfully");
+        }
+        else
+        {
+            Debug.LogError("Resume button not assigned!");
         }
     }
 
@@ -43,11 +51,6 @@ public class Pause : MonoBehaviour
             else
                 PauseGame();
         }
-        if (Input.GetMouseButtonDown(0))
-        {
-            Debug.Log("Mouse clicked at: " + Input.mousePosition);
-        }
-
     }
 
     public void PauseGame()
@@ -77,7 +80,7 @@ public class Pause : MonoBehaviour
 #if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false;
 #else
-            Application.Quit();
+        Application.Quit();
 #endif
     }
 }
