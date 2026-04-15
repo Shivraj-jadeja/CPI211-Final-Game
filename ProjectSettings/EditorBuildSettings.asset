@@ -20,5 +20,8 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Sherry's MainGame.unity
     guid: 170023d3ece6de94e975a55dfe59c98c
+  - enabled: 1
+    path: Assets/Scenes/Loading.unity
+    guid: d68136b99b7411a40b4414ceccc04629
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}

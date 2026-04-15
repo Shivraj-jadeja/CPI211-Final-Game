@@ -791,7 +791,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 50f5406ec6f5e6e42b3e21216a6517a9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SceneLoader
-  sceneName: Sherry's MainGame
+  sceneName: Loading
   RightserverButton: {fileID: 2119318418}
 --- !u!1 &2119318417
 GameObject:

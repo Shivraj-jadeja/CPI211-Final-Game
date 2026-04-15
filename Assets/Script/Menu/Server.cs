@@ -5,7 +5,7 @@ using UnityEngine.UI;
 public class SceneLoader : MonoBehaviour
 {
     [Header("Scene Settings")]
-    public string sceneName = "Sherry's MainGame";
+    public string sceneName = "Loading";
 
     [Header("Button Settings (Optional)")]
     public Button RightserverButton;
