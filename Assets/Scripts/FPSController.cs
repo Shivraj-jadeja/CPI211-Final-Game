@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 
 [RequireComponent(typeof(CharacterController))]
 public class FPSController : MonoBehaviour
@@ -109,5 +110,25 @@ public class FPSController : MonoBehaviour
         }
 
         transform.Rotate(Vector3.up * mouseX);
+    }
+
+    // Add this to your FPSController class
+    public void ActivatePotionBuff()
+    {
+        Debug.Log("🧪 Potion buff activated! Sprint speed increased!");
+        // Your potion logic here
+        // For example:
+        StartCoroutine(PotionBuffCoroutine());
+    }
+
+    private IEnumerator PotionBuffCoroutine()
+    {
+        float originalSprintSpeed = sprintSpeed;
+        sprintSpeed = 12f; // Boosted speed
+
+        yield return new WaitForSeconds(15f);
+
+        sprintSpeed = originalSprintSpeed;
+        Debug.Log("Potion buff wore off");
     }
 }
