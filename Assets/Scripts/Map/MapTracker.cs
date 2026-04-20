@@ -16,7 +16,6 @@ public class MapTracker : MonoBehaviour
     [Header("Map Settings")]
     public bool invertX = true;
     public bool invertZ = true;
-
     public Vector2 markerOffset;
 
     void Update()
@@ -33,5 +32,8 @@ public class MapTracker : MonoBehaviour
         float mapY = (normalizedZ * mapPaperRect.rect.height) - (mapPaperRect.rect.height / 2f);
 
         playerMarkerRect.anchoredPosition = new Vector2(mapX, mapY) + markerOffset;
+
+        float yaw = player.eulerAngles.y;
+        playerMarkerRect.localRotation = Quaternion.Euler(0f, 0f, -yaw + 180f);
     }
 }
