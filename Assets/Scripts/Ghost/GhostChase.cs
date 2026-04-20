@@ -11,6 +11,7 @@ public class GhostChase : MonoBehaviour
     public float movementThreshold = 0.02f;
 
     [HideInInspector] public bool isPhasing = false;
+    [HideInInspector] public bool isActive = false;
 
     private NavMeshAgent agent;
     private Vector3 lastPosition;
@@ -30,6 +31,21 @@ public class GhostChase : MonoBehaviour
 
     void Update()
     {
+        if (!isActive)
+        {
+            if (agent.enabled)
+            {
+                agent.ResetPath();
+            }
+
+            if (trail != null)
+            {
+                trail.emitting = false;
+            }
+
+            return;
+        }
+
         if (player == null) return;
 
         float distance = Vector3.Distance(transform.position, player.position);
@@ -92,5 +108,33 @@ public class GhostChase : MonoBehaviour
 
         float movedDistance = Vector3.Distance(transform.position, lastPosition);
         trail.emitting = movedDistance > movementThreshold;
+    }
+
+    public void ActivateGhost()
+    {
+        isActive = true;
+
+        if (agent != null)
+        {
+            agent.enabled = true;
+            agent.Warp(transform.position);
+        }
+    }
+
+    public void DeactivateGhost()
+    {
+        isActive = false;
+        isPhasing = false;
+
+        if (trail != null)
+        {
+            trail.emitting = false;
+            trail.Clear();
+        }
+
+        if (agent != null && agent.enabled)
+        {
+            agent.ResetPath();
+        }
     }
 }
