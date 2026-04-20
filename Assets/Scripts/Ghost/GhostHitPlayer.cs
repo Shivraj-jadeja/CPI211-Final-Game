@@ -3,23 +3,22 @@ using UnityEngine;
 public class GhostHitPlayer : MonoBehaviour
 {
     public GhostSpawner spawner;
+    public Transform player;
+    public float hitDistance = 1.5f;
 
-    private void OnTriggerEnter(Collider other)
+    void Update()
     {
-        Debug.Log("Ghost trigger touched: " + other.name);
+        if (spawner == null || player == null) return;
 
-        if (other.CompareTag("Player"))
+        if (!gameObject.activeInHierarchy) return;
+
+        float distance = Vector3.Distance(transform.position, player.position);
+
+        if (distance <= hitDistance)
         {
-            Debug.Log("Ghost touched player");
+            Debug.Log("Ghost reached player");
 
-            if (spawner != null)
-            {
-                spawner.GhostDespawned();
-            }
-            else
-            {
-                Debug.Log("Spawner reference is missing!");
-            }
+            spawner.GhostDespawned();
         }
     }
 }
