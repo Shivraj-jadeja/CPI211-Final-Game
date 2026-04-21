@@ -20,12 +20,18 @@ public class FPSController : MonoBehaviour
     public float groundDistance = 0.2f;
     public LayerMask groundMask;
 
+    [Header("Potion Settings")]
+    public float potionSprintDuration = 15f;
+    public float potionSprintSpeed = 12f;
+    private bool isPotionActive = false;
+    private float currentSpeed;
+    private float originalWalkSpeed;
+
     private float xRotation = 0f;
     private float currentXRotation = 0f;
     private float xRotationVelocity = 0f;
     private Vector3 velocity;
     private bool isGrounded;
-    private float currentSpeed;
     private CharacterController controller;
 
     void Start()
@@ -33,9 +39,11 @@ public class FPSController : MonoBehaviour
         controller = GetComponent<CharacterController>();
         Cursor.lockState = CursorLockMode.Locked;
         currentSpeed = walkSpeed;
+        originalWalkSpeed = walkSpeed;
         transform.rotation = Quaternion.identity;
 
-        Debug.Log("FPS Controller Started - Movement is now camera-relative");
+        Debug.Log("FPS Controller Started - Movement is camera-relative");
+        Debug.Log("Use Potion (Hold 3 for 4 seconds) to gain sprint speed for 15 seconds!");
     }
 
     void Update()
@@ -73,11 +81,7 @@ public class FPSController : MonoBehaviour
             // Calculate movement direction based on camera orientation
             Vector3 move = (cameraForward * vertical) + (cameraRight * horizontal);
 
-            // Sprint check
-            bool isSprinting = Input.GetKey(KeyCode.LeftShift) && vertical > 0;
-            currentSpeed = isSprinting ? sprintSpeed : walkSpeed;
-
-            // Apply movement
+            // Apply movement with current speed (normal or potion-boosted)
             controller.Move(move * currentSpeed * Time.deltaTime);
         }
 
@@ -112,23 +116,94 @@ public class FPSController : MonoBehaviour
         transform.Rotate(Vector3.up * mouseX);
     }
 
-    // Add this to your FPSController class
+    // Public method to activate potion buff (called from InventorySystem)
     public void ActivatePotionBuff()
     {
-        Debug.Log("🧪 Potion buff activated! Sprint speed increased!");
-        // Your potion logic here
-        // For example:
-        StartCoroutine(PotionBuffCoroutine());
+        if (!isPotionActive)
+        {
+            StartCoroutine(PotionBuffCoroutine());
+        }
+        else
+        {
+            Debug.Log("Potion effect already active!");
+        }
     }
 
     private IEnumerator PotionBuffCoroutine()
     {
-        float originalSprintSpeed = sprintSpeed;
-        sprintSpeed = 12f; // Boosted speed
+        isPotionActive = true;
+        currentSpeed = potionSprintSpeed;
 
-        yield return new WaitForSeconds(15f);
+        Debug.Log($"🧪 Potion activated! Speed increased to {potionSprintSpeed} for {potionSprintDuration} seconds!");
 
-        sprintSpeed = originalSprintSpeed;
-        Debug.Log("Potion buff wore off");
+        // Visual feedback - you can add effects here
+        StartCoroutine(ScreenFlashEffect());
+
+        float remainingTime = potionSprintDuration;
+        while (remainingTime > 0)
+        {
+            remainingTime -= Time.deltaTime;
+            yield return null;
+        }
+
+        currentSpeed = walkSpeed;
+        isPotionActive = false;
+        Debug.Log("🏃 Potion effect wore off. Speed returned to normal.");
+    }
+
+    private IEnumerator ScreenFlashEffect()
+    {
+        // Optional: Add a visual effect when potion is used
+        float flashDuration = 0.2f;
+        float elapsed = 0f;
+
+        while (elapsed < flashDuration)
+        {
+            elapsed += Time.deltaTime;
+            // Here you would update a UI image's alpha or color
+            // For example: flashImage.color = new Color(1,1,1, 1 - (elapsed / flashDuration));
+            yield return null;
+        }
+
+        Debug.Log("✨ Potion visual effect completed!");
+    }
+
+    // Optional: Method to check if potion is active (for UI)
+    public bool IsPotionActive()
+    {
+        return isPotionActive;
+    }
+
+    // Optional: Get remaining potion time (for UI display)
+    public float GetRemainingPotionTime()
+    {
+        if (isPotionActive)
+        {
+            // This would need to track the actual remaining time
+            // For a complete implementation, store the start time
+            return potionSprintDuration - (Time.time - potionStartTime);
+        }
+        return 0f;
+    }
+
+    // Add this variable for tracking potion start time
+    private float potionStartTime;
+
+    // Updated PotionBuffCoroutine with time tracking
+    private IEnumerator PotionBuffCoroutineWithTimer()
+    {
+        isPotionActive = true;
+        potionStartTime = Time.time;
+        currentSpeed = potionSprintSpeed;
+
+        Debug.Log($"🧪 Potion activated! Speed increased to {potionSprintSpeed} for {potionSprintDuration} seconds!");
+
+        StartCoroutine(ScreenFlashEffect());
+
+        yield return new WaitForSeconds(potionSprintDuration);
+
+        currentSpeed = walkSpeed;
+        isPotionActive = false;
+        Debug.Log("🏃 Potion effect wore off. Speed returned to normal.");
     }
 }
