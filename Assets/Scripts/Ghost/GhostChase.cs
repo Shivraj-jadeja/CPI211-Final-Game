@@ -4,11 +4,17 @@ using UnityEngine.AI;
 public class GhostChase : MonoBehaviour
 {
     public Transform player;
-    public float chaseDistance = 20f;
     public float chaseSpeed = 4.5f;
     public float phaseSpeed = 4.5f;
     public TrailRenderer trail;
     public float movementThreshold = 0.02f;
+
+    [Header("Audio")]
+    public AudioSource ghostAudio;
+    public AudioClip ghostSound;
+    public float minVolume = 0.1f;
+    public float maxVolume = 1f;
+    public float maxAudioDistance = 25f;
 
     [HideInInspector] public bool isPhasing = false;
     [HideInInspector] public bool isActive = false;
@@ -27,40 +33,44 @@ public class GhostChase : MonoBehaviour
         {
             trail.emitting = false;
         }
+
+        if (ghostAudio != null)
+        {
+            ghostAudio.playOnAwake = false;
+            ghostAudio.loop = true;
+            ghostAudio.spatialBlend = 1f;
+
+            if (ghostSound != null)
+            {
+                ghostAudio.clip = ghostSound;
+            }
+
+            ghostAudio.Stop();
+        }
     }
 
     void Update()
     {
         if (!isActive)
         {
-            if (agent.enabled)
-            {
-                agent.ResetPath();
-            }
+            StopAudio();
 
             if (trail != null)
             {
                 trail.emitting = false;
             }
 
-            return;
-        }
-
-        if (player == null) return;
-
-        float distance = Vector3.Distance(transform.position, player.position);
-
-        if (distance > chaseDistance)
-        {
-            if (agent.enabled)
+            if (agent != null && agent.enabled)
             {
                 agent.ResetPath();
             }
 
-            UpdateTrail();
-            lastPosition = transform.position;
             return;
         }
+
+        PlayAudio();
+
+        if (player == null) return;
 
         if (isPhasing)
         {
@@ -99,6 +109,8 @@ public class GhostChase : MonoBehaviour
         }
 
         UpdateTrail();
+        UpdateAudioVolume();
+
         lastPosition = transform.position;
     }
 
@@ -108,6 +120,34 @@ public class GhostChase : MonoBehaviour
 
         float movedDistance = Vector3.Distance(transform.position, lastPosition);
         trail.emitting = movedDistance > movementThreshold;
+    }
+
+    void PlayAudio()
+    {
+        if (ghostAudio == null || ghostAudio.clip == null) return;
+
+        if (!ghostAudio.isPlaying)
+        {
+            ghostAudio.Play();
+        }
+    }
+
+    void StopAudio()
+    {
+        if (ghostAudio != null && ghostAudio.isPlaying)
+        {
+            ghostAudio.Stop();
+        }
+    }
+
+    void UpdateAudioVolume()
+    {
+        if (player == null || ghostAudio == null) return;
+
+        float distance = Vector3.Distance(transform.position, player.position);
+        float t = 1f - Mathf.Clamp01(distance / maxAudioDistance);
+
+        ghostAudio.volume = Mathf.Lerp(minVolume, maxVolume, t);
     }
 
     public void ActivateGhost()
@@ -136,5 +176,7 @@ public class GhostChase : MonoBehaviour
         {
             agent.ResetPath();
         }
+
+        StopAudio();
     }
 }
