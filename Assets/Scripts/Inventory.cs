@@ -287,7 +287,7 @@ public class InventorySystem : MonoBehaviour
             if (inventorySlots[2].item == null)
                 inventorySlots[2].item = new InventoryItem();
             inventorySlots[2].item.itemName = "Potion";
-            inventorySlots[2].item.itemDescription = "HOLD [3] FOR 4 SEC TO USE";
+            inventorySlots[2].item.itemDescription = "HOLD [3] FOR 4 SEC TO USE\n Increases speed for 15 seconds";
             inventorySlots[2].item.canHoldToUse = true;
             inventorySlots[2].item.useAction = () => Debug.Log(" Potion used! ");
         }
