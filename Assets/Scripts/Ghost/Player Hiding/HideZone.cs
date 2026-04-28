@@ -3,7 +3,6 @@ using UnityEngine;
 public class HideZone : MonoBehaviour
 {
     public Transform hidePoint;
-    public Transform exitPoint;
     public Transform playerCamera;
 
     [Header("Player Control")]
@@ -19,7 +18,10 @@ public class HideZone : MonoBehaviour
     private CharacterController controller;
     private bool playerInside = false;
     private bool isHiding = false;
+
     private Vector3 originalCameraLocalPos;
+    private Vector3 enterPosition;
+    private Quaternion enterRotation;
     private Vector3 lockedGhostPassTarget;
 
     public Vector3 GhostPassTarget => lockedGhostPassTarget;
@@ -45,6 +47,9 @@ public class HideZone : MonoBehaviour
     private void EnterHide()
     {
         isHiding = true;
+
+        enterPosition = player.position;
+        enterRotation = player.rotation;
 
         controller = player.GetComponent<CharacterController>();
 
@@ -105,8 +110,8 @@ public class HideZone : MonoBehaviour
     {
         isHiding = false;
 
-        if (exitPoint != null)
-            player.position = exitPoint.position;
+        player.position = enterPosition;
+        player.rotation = enterRotation;
 
         if (controller != null)
             controller.enabled = true;

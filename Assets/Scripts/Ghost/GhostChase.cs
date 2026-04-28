@@ -8,11 +8,14 @@ public class GhostChase : MonoBehaviour
 
     public float chaseSpeed = 4.5f;
     public float phaseSpeed = 4.5f;
-    public float passBySpeed = 6f;
-    public float passDespawnDistance = 1.2f;
+    public float passBySpeed = 7f;
+    public float passDespawnDistance = 0.8f;
 
     public TrailRenderer trail;
     public float movementThreshold = 0.02f;
+
+    [Header("Hide Pass Settings")]
+    public float maxHidePassTime = 4f;
 
     [Header("Audio")]
     public AudioSource ghostAudio;
@@ -26,6 +29,9 @@ public class GhostChase : MonoBehaviour
 
     private NavMeshAgent agent;
     private Vector3 lastPosition;
+
+    private float hidePassTimer = 0f;
+    private bool wasPlayerHidden = false;
 
     void Start()
     {
@@ -73,6 +79,9 @@ public class GhostChase : MonoBehaviour
             MovePastHideZone();
             return;
         }
+
+        wasPlayerHidden = false;
+        hidePassTimer = 0f;
 
         if (player == null) return;
 
@@ -127,6 +136,12 @@ public class GhostChase : MonoBehaviour
             return;
         }
 
+        if (!wasPlayerHidden)
+        {
+            hidePassTimer = 0f;
+            wasPlayerHidden = true;
+        }
+
         if (!agent.enabled)
         {
             agent.enabled = true;
@@ -136,24 +151,41 @@ public class GhostChase : MonoBehaviour
         agent.speed = passBySpeed;
 
         Vector3 passTarget = zone.GhostPassTarget;
+
+        NavMeshHit hit;
+        if (NavMesh.SamplePosition(passTarget, out hit, 5f, NavMesh.AllAreas))
+        {
+            passTarget = hit.position;
+        }
+
         agent.SetDestination(passTarget);
+
+        hidePassTimer += Time.deltaTime;
 
         float distance = Vector3.Distance(transform.position, passTarget);
 
-        if (distance <= passDespawnDistance)
+        if (distance <= passDespawnDistance || hidePassTimer >= maxHidePassTime)
         {
-            if (spawner != null)
-                spawner.GhostDespawned();
-            else
-            {
-                DeactivateGhost();
-                gameObject.SetActive(false);
-            }
+            DespawnAfterPassing();
+            return;
         }
 
         UpdateTrail();
         UpdateAudioVolume();
         lastPosition = transform.position;
+    }
+
+    void DespawnAfterPassing()
+    {
+        if (spawner != null)
+        {
+            spawner.GhostDespawned();
+        }
+        else
+        {
+            DeactivateGhost();
+            gameObject.SetActive(false);
+        }
     }
 
     void UpdateTrail()
@@ -191,6 +223,8 @@ public class GhostChase : MonoBehaviour
     public void ActivateGhost()
     {
         isActive = true;
+        wasPlayerHidden = false;
+        hidePassTimer = 0f;
 
         if (agent != null)
         {
@@ -203,6 +237,8 @@ public class GhostChase : MonoBehaviour
     {
         isActive = false;
         isPhasing = false;
+        wasPlayerHidden = false;
+        hidePassTimer = 0f;
 
         if (trail != null)
         {
