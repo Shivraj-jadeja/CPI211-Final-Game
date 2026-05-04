@@ -17,17 +17,22 @@ public class PlayerInventory : MonoBehaviour
     }
     public bool AddItem(Item item)
     {
-        for (int i = 0; i < slots.Length; i++)
+        if(item.itemName == "Medkit")
         {
-            if (slots[i] == null)
-            {
-                slots[i] = item;
-                Debug.Log("Picked up: " + item.itemName);
-                return true;
-            }
+            slots[1] = item;
+            Debug.Log("YIIIIPPPEEEEE!!!");
+            return true;
+        }else if(item.itemName == "Potion")
+        {
+            slots[2] = item;
+            return true;
+        }else if(item.itemName == "Key")
+        {
+            slots[3] = item;
+            return true;
         }
 
-        Debug.Log("Inventory full!");
+            Debug.Log("Shit aint work");
         return false;
     }
     void SelectSlot(int index)

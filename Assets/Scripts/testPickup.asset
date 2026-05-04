@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 437d40dae515d4546a8c4ab7bfb09983, type: 3}
   m_Name: testPickup
   m_EditorClassIdentifier: Assembly-CSharp::Item
-  itemName: test
+  itemName: Medkit
   icon: {fileID: 10901, guid: 0000000000000000f000000000000000, type: 0}
   heldPrefab: {fileID: 5182887481197194993, guid: 84e086aa6f6048349853e87b3d4de284, type: 3}

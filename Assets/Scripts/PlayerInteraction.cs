@@ -18,6 +18,7 @@ public class PlayerInteraction : MonoBehaviour
                 Pickup pickup = hit.collider.GetComponent<Pickup>();
                 if (pickup != null)
                 {
+                    Debug.Log("OH SHIT!!!");
                     pickup.PickUp(GetComponent<PlayerInventory>());
                 }
             }
