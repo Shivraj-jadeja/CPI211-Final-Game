@@ -7,6 +7,9 @@ public class SightMonsterAI : MonoBehaviour
     public Camera playerCamera;
     public SightMonsterSpawner spawner;
 
+    [Header("Visual")]
+    public Transform visualRoot;
+
     [Header("Movement")]
     public float chaseSpeed = 5f;
     public float spinSpeed = 720f;
@@ -36,7 +39,14 @@ public class SightMonsterAI : MonoBehaviour
         monsterCollider = GetComponent<Collider>();
         monsterRenderer = GetComponentInChildren<Renderer>();
 
-        agent.speed = chaseSpeed;
+        if (agent != null)
+        {
+            agent.speed = chaseSpeed;
+            agent.updateRotation = true;
+        }
+
+        if (visualRoot == null)
+            visualRoot = transform;
 
         if (monsterAudio != null)
         {
@@ -55,15 +65,6 @@ public class SightMonsterAI : MonoBehaviour
     {
         if (!isActive) return;
         if (player == null || playerCamera == null) return;
-
-        if (agent != null && agent.enabled && !agent.isOnNavMesh)
-        {
-            NavMeshHit hit;
-            if (NavMesh.SamplePosition(transform.position, out hit, 5f, NavMesh.AllAreas))
-            {
-                agent.Warp(hit.position);
-            }
-        }
 
         bool playerSeesMonster = IsSeenByPlayer();
 
@@ -86,17 +87,28 @@ public class SightMonsterAI : MonoBehaviour
         seenTimer = 0f;
 
         ChasePlayer();
-        SpinMonster();
+        SpinVisual();
         PlayAudio();
         UpdateAudioVolume();
     }
 
     void ChasePlayer()
     {
+        if (agent == null) return;
+
         if (!agent.enabled)
         {
             agent.enabled = true;
             agent.Warp(transform.position);
+        }
+
+        if (!agent.isOnNavMesh)
+        {
+            NavMeshHit hit;
+            if (NavMesh.SamplePosition(transform.position, out hit, 5f, NavMesh.AllAreas))
+                agent.Warp(hit.position);
+            else
+                return;
         }
 
         agent.isStopped = false;
@@ -106,7 +118,7 @@ public class SightMonsterAI : MonoBehaviour
 
     void StopMonster()
     {
-        if (agent.enabled)
+        if (agent != null && agent.enabled && agent.isOnNavMesh)
         {
             agent.isStopped = true;
             agent.ResetPath();
@@ -115,15 +127,16 @@ public class SightMonsterAI : MonoBehaviour
         StopAudio();
     }
 
-    void SpinMonster()
+    void SpinVisual()
     {
-        transform.Rotate(Vector3.up * spinSpeed * Time.deltaTime, Space.World);
+        if (visualRoot == null) return;
+
+        visualRoot.Rotate(Vector3.up * spinSpeed * Time.deltaTime, Space.Self);
     }
 
     bool IsSeenByPlayer()
     {
         Vector3 checkPoint = GetMonsterLookPoint();
-
         Vector3 viewportPos = playerCamera.WorldToViewportPoint(checkPoint);
 
         if (viewportPos.z <= 0f)
@@ -190,9 +203,7 @@ public class SightMonsterAI : MonoBehaviour
 
             NavMeshHit hit;
             if (NavMesh.SamplePosition(transform.position, out hit, 5f, NavMesh.AllAreas))
-            {
                 agent.Warp(hit.position);
-            }
         }
 
         PlayAudio();
@@ -203,7 +214,7 @@ public class SightMonsterAI : MonoBehaviour
         isActive = false;
         seenTimer = 0f;
 
-        if (agent != null && agent.enabled)
+        if (agent != null && agent.enabled && agent.isOnNavMesh)
         {
             agent.isStopped = true;
             agent.ResetPath();
