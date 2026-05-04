@@ -51,10 +51,19 @@ public class HideZone : MonoBehaviour
         enterPosition = player.position;
         enterRotation = player.rotation;
 
-        controller = player.GetComponent<CharacterController>();
+        // Auto-find needed player references if they were not assigned in Inspector.
+        if (controller == null)
+            controller = player.GetComponent<CharacterController>();
 
         if (fpsController == null)
             fpsController = player.GetComponent<FPSController>();
+
+        if (playerCamera == null)
+        {
+            Camera cam = player.GetComponentInChildren<Camera>();
+            if (cam != null)
+                playerCamera = cam.transform;
+        }
 
         if (fpsController != null)
             fpsController.canMove = false;
@@ -135,6 +144,16 @@ public class HideZone : MonoBehaviour
 
             if (fpsController == null)
                 fpsController = other.GetComponent<FPSController>();
+
+            if (controller == null)
+                controller = other.GetComponent<CharacterController>();
+
+            if (playerCamera == null)
+            {
+                Camera cam = other.GetComponentInChildren<Camera>();
+                if (cam != null)
+                    playerCamera = cam.transform;
+            }
         }
     }
 
