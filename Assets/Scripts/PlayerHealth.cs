@@ -5,7 +5,7 @@ using UnityEngine.UIElements;
 
 public class PlayerHealth : MonoBehaviour
 {
-    [SerializeField] public int health;
+    [SerializeField] public double health;
     [SerializeField] public UnityEngine.UI.Image hbar;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -16,11 +16,17 @@ public class PlayerHealth : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.E))
-        {
-            health -= 1;
-        }
-        hbar.fillAmount = health / 100;
+        //if (Input.GetKeyDown(KeyCode.E))
+        //{
+        //    health -= 0.01;
+        //}
+        hbar.fillAmount = (float)health;
     }
-    
+    private void OnCollisionEnter(Collision col)
+    {
+        if(col.gameObject.tag == "Enemy")
+        {
+            health -= 0.05;
+        }
+    }
 }
