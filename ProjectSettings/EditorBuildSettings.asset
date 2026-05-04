@@ -21,7 +21,7 @@ EditorBuildSettings:
     path: Assets/Scenes/Loading.unity
     guid: d68136b99b7411a40b4414ceccc04629
   - enabled: 1
-    path: Assets/Scenes/base for the game!!.unity
+    path: Assets/Scenes/Shiv - Level Design & Map.unity
     guid: f18074124bf8d7f48bacd53d86cabf2d
   - enabled: 1
     path: Assets/Scenes/End.unity
