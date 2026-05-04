@@ -14,4 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Item
   itemName: Medkit
   icon: {fileID: 10901, guid: 0000000000000000f000000000000000, type: 0}
-  heldPrefab: {fileID: 7670015650346029543, guid: b78c53bb3f0026d49a69eecae54378c1, type: 3}
+  heldPrefab: {fileID: 919132149155446097, guid: 70613aa8bd850c6458733a6b34338ac5, type: 3}
