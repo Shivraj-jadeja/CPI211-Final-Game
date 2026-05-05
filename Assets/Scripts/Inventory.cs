@@ -4,7 +4,7 @@ using TMPro;
 using System.Collections;
 using System.Collections.Generic;
 
-public class InventorySystem : MonoBehaviour
+public class Inventory : MonoBehaviour
 {
     [System.Serializable]
     public class InventorySlot
@@ -112,6 +112,11 @@ public class InventorySystem : MonoBehaviour
         Debug.Log("Inventory System Started! Press 1-4 to show/hide item panel");
     }
 
+    void Awake()
+    {
+        // Make this GameObject persistent across scenes
+        DontDestroyOnLoad(gameObject);
+    }
     void SetupRenderTextureBridge()
     {
         // Create RenderTexture at runtime
