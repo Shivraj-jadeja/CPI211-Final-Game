@@ -8,6 +8,7 @@ public class FPSController : MonoBehaviour
     public float sprintSpeed = 8f;
     public float gravity = -9.81f;
     public float jumpHeight = 1.5f;
+    public bool canMove = true;
 
     [Header("Mouse Look")]
     public float mouseSensitivity = 0.8f;
@@ -33,68 +34,55 @@ public class FPSController : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
         currentSpeed = walkSpeed;
         transform.rotation = Quaternion.identity;
-
-        Debug.Log("FPS Controller Started - Movement is now camera-relative");
     }
 
     void Update()
     {
-        // ----- INPUT -----
-        float horizontal = Input.GetAxisRaw("Horizontal");  // A/D
-        float vertical = Input.GetAxisRaw("Vertical");      // W/S
+        if (!canMove)
+        {
+            velocity = Vector3.zero;
+            return;
+        }
 
-        // ----- GROUND CHECK -----
+        float horizontal = Input.GetAxisRaw("Horizontal");
+        float vertical = Input.GetAxisRaw("Vertical");
+
         if (groundCheck != null)
         {
             isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
 
             if (isGrounded && velocity.y < 0)
-            {
                 velocity.y = -2f;
-            }
         }
 
-        // ----- MOVEMENT (Camera Relative) -----
         if (horizontal != 0 || vertical != 0)
         {
-            // Get camera's forward and right directions
             Vector3 cameraForward = cameraTransform.forward;
             Vector3 cameraRight = cameraTransform.right;
 
-            // Remove vertical component to keep movement on ground plane
             cameraForward.y = 0;
             cameraRight.y = 0;
 
-            // Normalize to maintain direction
             cameraForward.Normalize();
             cameraRight.Normalize();
 
-            // Calculate movement direction based on camera orientation
             Vector3 move = (cameraForward * vertical) + (cameraRight * horizontal);
 
-            // Sprint check
             bool isSprinting = Input.GetKey(KeyCode.LeftShift) && vertical > 0;
             currentSpeed = isSprinting ? sprintSpeed : walkSpeed;
 
-            // Apply movement
             controller.Move(move * currentSpeed * Time.deltaTime);
         }
 
-        // ----- JUMP -----
         if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
-        {
             velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
-            Debug.Log("Jumped!");
-        }
 
-        // ----- GRAVITY -----
         velocity.y += gravity * Time.deltaTime;
         controller.Move(velocity * Time.deltaTime);
     }
 
     void LateUpdate()
     {
-        // ----- SMOOTH MOUSE LOOK -----
         float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity;
         float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity;
 
@@ -104,9 +92,7 @@ public class FPSController : MonoBehaviour
         currentXRotation = Mathf.SmoothDamp(currentXRotation, xRotation, ref xRotationVelocity, lookSmoothDamp);
 
         if (cameraTransform != null)
-        {
             cameraTransform.localRotation = Quaternion.Euler(currentXRotation, 0f, 0f);
-        }
 
         transform.Rotate(Vector3.up * mouseX);
     }
